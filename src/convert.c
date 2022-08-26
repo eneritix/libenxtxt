@@ -21,330 +21,330 @@
  */
 
 #include "convert.h"
+#include <string.h>
 
 
-static size_t enxtxt_conv_u32_to_dec_in_place(uint32_t value, char *result);
-static size_t enxtxt_conv_s32_to_dec_in_place(int32_t value, char *result);
 
-static size_t enxtxt_conv_u16_to_dec_in_place(uint16_t value, char *result);
-static size_t enxtxt_conv_s16_to_dec_in_place(int16_t value, char *result);
-
-static size_t enxtxt_conv_u8_to_dec_in_place(uint8_t value, char *result);
-static size_t enxtxt_conv_s8_to_dec_in_place(int8_t value, char *result);
-
-static size_t enxtxt_conv_u32_to_hex_in_place(uint32_t value, char *result);
-static size_t enxtxt_conv_u16_to_hex_in_place(uint16_t value, char *result);
-static size_t enxtxt_conv_u8_to_hex_in_place(uint8_t value, char *result);
-
-
-static const char enxtxt_hex_digits[] = 
+int32_t enxtxt_dec_to_s32_pl_ex(const char *ptr, size_t length, const char **pos, bool *result)
 {
-    '0', '1', '2', '3',
-    '4', '5', '6', '7',
-    '8', '9', 'A', 'B',
-    'C', 'D', 'E', 'F'
-};
+    typedef enum {
+        ps_whitespace,
+        ps_digits,
+        ps_done,
+        ps_error
 
+    } parse_state_t;
 
-static size_t enxtxt_conv_u32_to_dec_in_place(uint32_t value, char *result)
-{
-    /* https://en.wikipedia.org/wiki/Double_dabble */
+    parse_state_t parse_state = ps_whitespace;
+    bool negative = false;
+    uint32_t value = 0;
+    size_t index = 0;
 
-    char *ptr = result;
-    uint32_t reg0, reg1;
-    uint32_t i = 0;
-    uint8_t digit;
-    bool output;
+    while ((index < length) &&
+           (parse_state != ps_done) &&
+           (parse_state != ps_error)) {
 
-    reg0 = 0;
-    reg1 = 0;
+        switch (parse_state) {
+        case ps_whitespace: {
 
+            if (ptr[index] == ' ') {
+                index++;
 
-    for (i=0; i < 32; ++i) {
+            } else if (ptr[index] == '+') {
+                parse_state = ps_digits;
+                index++;
 
-        /* uint32_t max is 4294967296 (10 digits). We need to process
-         * all the nibbles of reg0 and only the first two nibbles of reg1.
-         * The operations for the rest of the nibbles are kept for completeness
-         * but commented out for performance.
-         */
-        /* if ((reg1 & 0xF0000000) >= 0x50000000) reg1 += 0x30000000; */
-        /* if ((reg1 & 0x0F000000) >= 0x05000000) reg1 += 0x03000000; */
-        /* if ((reg1 & 0x00F00000) >= 0x00500000) reg1 += 0x00300000; */
-        /* if ((reg1 & 0x000F0000) >= 0x00050000) reg1 += 0x00030000; */
-        /* if ((reg1 & 0x0000F000) >= 0x00005000) reg1 += 0x00003000; */
-        /* if ((reg1 & 0x00000F00) >= 0x00000500) reg1 += 0x00000300; */
-        if ((reg1 & 0x000000F0) >= 0x00000050) reg1 += 0x00000030;
-        if ((reg1 & 0x0000000F) >= 0x00000005) reg1 += 0x00000003;
+            } else if (ptr[index] == '-') {
+                parse_state = ps_digits;
+                negative = true;
+                index++;
 
-        if ((reg0 & 0xF0000000) >= 0x50000000) reg0 += 0x30000000;
-        if ((reg0 & 0x0F000000) >= 0x05000000) reg0 += 0x03000000;
-        if ((reg0 & 0x00F00000) >= 0x00500000) reg0 += 0x00300000;
-        if ((reg0 & 0x000F0000) >= 0x00050000) reg0 += 0x00030000;
-        if ((reg0 & 0x0000F000) >= 0x00005000) reg0 += 0x00003000;
-        if ((reg0 & 0x00000F00) >= 0x00000500) reg0 += 0x00000300;
-        if ((reg0 & 0x000000F0) >= 0x00000050) reg0 += 0x00000030;
-        if ((reg0 & 0x0000000F) >= 0x00000005) reg0 += 0x00000003;
+            } else if ((ptr[index] >= '0') && (ptr[index] <= '9')) {
+                parse_state = ps_digits;
 
-        /* Shift */
-        reg1 <<= 1;
-        reg1 |= (reg0 >> 31);
+            } else {
+                parse_state = ps_error;
+            }
 
-        reg0 <<= 1;
-        reg0 |= (value >> 31);
+        } break;
 
-        value <<= 1;
+        case ps_digits: {
+
+            if ((ptr[index] >= '0') && (ptr[index] <= '9')) {
+                parse_state = ps_digits;
+                value = (((value << 3) + (value << 1))) + (ptr[index] - '0');
+                index++;
+
+            } else {
+                parse_state = ps_done;
+            }
+
+        } break;
+
+        default: break;
+        }
     }
 
-    // Collect
-    output = false;
-
-    /* digit = ((reg1 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    digit = ((reg1 & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg1 & 0x0000000F) >> 0 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-
-    digit = ((reg0 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg0 & 0x0000000F) >> 0 );                                    *ptr++ = ('0' + digit);
-
-    *ptr++ = 0;
-
-    return (ptr - result - 1);
-}
-
-static size_t enxtxt_conv_s32_to_dec_in_place(int32_t value, char *result)
-{
-    char *ptr = result;
-    const int32_t mask = (value >> 31);
-    const uint32_t absolute_value = ((value + mask) ^ mask);
-
-    if (mask) {
-        *ptr++ = '-';
+    if (negative) {
+        value = ~value + 1;
     }
 
-    return ((ptr - result) + enxtxt_conv_u32_to_dec_in_place(absolute_value, ptr));
-}
-
-static size_t enxtxt_conv_u16_to_dec_in_place(uint16_t value, char *result)
-{
-    /* https://en.wikipedia.org/wiki/Double_dabble */
-
-    char *ptr = result;
-    uint32_t reg;
-    uint32_t i = 0;
-    uint8_t digit;
-    bool output;
-
-    reg = 0;
-
-
-    for (i=0; i < 16; ++i) {
-
-        /* uint16_t max is 65536 (5 digits). */
-        if ((reg & 0x000F0000) >= 0x00050000) reg += 0x00030000;
-        if ((reg & 0x0000F000) >= 0x00005000) reg += 0x00003000;
-        if ((reg & 0x00000F00) >= 0x00000500) reg += 0x00000300;
-        if ((reg & 0x000000F0) >= 0x00000050) reg += 0x00000030;
-        if ((reg & 0x0000000F) >= 0x00000005) reg += 0x00000003;
-
-        /* Shift */
-        reg <<= 1;
-        reg |= (value >> 15);
-
-        value <<= 1;
+    if (pos) {
+        *pos = ptr + index;
     }
 
-    // Collect
-    output = false;
-
-    digit = ((reg & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg & 0x0000000F) >> 0 );                                    *ptr++ = ('0' + digit);
-
-    *ptr++ = 0;
-
-    return (ptr - result - 1);
-}
-
-static size_t enxtxt_conv_s16_to_dec_in_place(int16_t value, char *result)
-{
-    char *ptr = result;
-    const int16_t mask = (value >> 31);
-    const uint16_t absolute_value = ((value + mask) ^ mask);
-
-    if (mask) {
-        *ptr++ = '-';
+    if (result) {
+        *result = (parse_state != ps_error);
     }
 
-    return ((ptr - result) + enxtxt_conv_u16_to_dec_in_place(absolute_value, ptr));
+    return (int32_t)value;
 }
 
-static size_t enxtxt_conv_u8_to_dec_in_place(uint8_t value, char *result)
+uint32_t enxtxt_dec_to_u32_pl_ex(const char *ptr, size_t length, const char **pos, bool *result)
 {
-    /* https://en.wikipedia.org/wiki/Double_dabble */
+    typedef enum {
+        ps_whitespace,
+        ps_digits,
+        ps_done,
+        ps_error
 
-    char *ptr = result;
-    uint32_t reg;
-    uint32_t i = 0;
-    uint8_t digit;
-    bool output;
+    } parse_state_t;
 
-    /* For 8 bits we can add the value to the shift register */
-    reg = value;
+    parse_state_t parse_state = ps_whitespace;
+    uint32_t value = 0;
+    size_t index = 0;
 
+    while ((index < length) &&
+           (parse_state != ps_done) &&
+           (parse_state != ps_error)) {
 
-    for (i=0; i < 8; ++i) {
+        switch (parse_state) {
+        case ps_whitespace: {
 
-        /* uint8_t max is 255 (3 digits). The first 8 bits of reg
-           is used for the value 
-        */
-        if ((reg & 0x000F0000) >= 0x00050000) reg += 0x00030000;
-        if ((reg & 0x0000F000) >= 0x00005000) reg += 0x00003000;
-        if ((reg & 0x00000F00) >= 0x00000500) reg += 0x00000300;
+            if (ptr[index] == ' ') {
+                index++;
 
-        /* Shift */
-        reg <<= 1;
+            } else if (ptr[index] == '+') {
+                parse_state = ps_digits;
+                index++;
+
+            } else if (ptr[index] == '-') {
+                parse_state = ps_error;
+
+            } else if ((ptr[index] >= '0') && (ptr[index] <= '9')) {
+                parse_state = ps_digits;
+
+            } else {
+                parse_state = ps_error;
+            }
+
+        } break;
+
+        case ps_digits: {
+
+            if ((ptr[index] >= '0') && (ptr[index] <= '9')) {
+                parse_state = ps_digits;
+                value = (((value << 3) + (value << 1))) + (ptr[index] - '0');
+                index++;
+
+            } else {
+                parse_state = ps_done;
+            }
+
+        } break;
+
+        default: break;
+        }
     }
 
-    // Collect
-    output = false;
-
-    digit = ((reg & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
-    digit = ((reg & 0x00000F00) >> 8 );                                    *ptr++ = ('0' + digit);
-
-    *ptr++ = 0;
-
-    return (ptr - result - 1);
-}
-
-static size_t enxtxt_conv_s8_to_dec_in_place(int8_t value, char *result)
-{
-    char *ptr = result;
-    const int8_t mask = (value >> 31);
-    const uint8_t absolute_value = ((value + mask) ^ mask);
-
-    if (mask) {
-        *ptr++ = '-';
+    if (pos) {
+        *pos = ptr + index;
     }
 
-    return ((ptr - result) + enxtxt_conv_u16_to_dec_in_place(absolute_value, ptr));
+    if (result) {
+        *result = (parse_state != ps_error);
+    }
+
+    return value;
 }
 
-static size_t enxtxt_conv_u32_to_hex_in_place(uint32_t value, char *result)
+static uint32_t enxtxt_hex_to_unsigned_pl_ex(const char *ptr, size_t length, const char **pos, bool *result, size_t max_digits)
 {
-    *result++ = enxtxt_hex_digits[(value & 0xF0000000) >> 28];
-    *result++ = enxtxt_hex_digits[(value & 0x0F000000) >> 24];
-    *result++ = enxtxt_hex_digits[(value & 0x00F00000) >> 20];
-    *result++ = enxtxt_hex_digits[(value & 0x000F0000) >> 16];
-    *result++ = enxtxt_hex_digits[(value & 0x0000F000) >> 12];
-    *result++ = enxtxt_hex_digits[(value & 0x00000F00) >> 8];
-    *result++ = enxtxt_hex_digits[(value & 0x000000F0) >> 4];
-    *result++ = enxtxt_hex_digits[(value & 0x0000000F) >> 0];
-    *result++ = 0;
+    typedef enum {
+        ps_whitespace,
+        ps_prefix,
+        ps_digits,
+        ps_done,
+        ps_error
 
-    return 8;
+    } parse_state_t;
+
+    parse_state_t parse_state = ps_whitespace;
+    uint32_t value = 0;
+    size_t index = 0;
+    size_t digits = 0;
+
+    while ((index < length) &&
+           (digits < max_digits) &&
+           (parse_state != ps_done) &&
+           (parse_state != ps_error)) {
+
+        switch (parse_state) {
+        case ps_whitespace: {
+
+            if (ptr[index] == ' ') {
+                index++;
+
+            } else if (ptr[index] == '0') {
+                parse_state = ps_prefix;
+                index++;
+
+            } else if (
+                ((ptr[index] >= '0') && (ptr[index] <= '9')) ||
+                ((ptr[index] >= 'a') && (ptr[index] <= 'f')) ||
+                ((ptr[index] >= 'A') && (ptr[index] <= 'F'))) {
+                parse_state = ps_digits;
+
+            } else {
+                parse_state = ps_error;
+            }
+
+        } break;
+
+        case ps_prefix: {
+
+            if ((ptr[index] == 'x') || (ptr[index] == 'X')) {
+                parse_state = ps_digits;
+                index++;
+
+            } else if (
+                ((ptr[index] >= '0') && (ptr[index] <= '9')) ||
+                ((ptr[index] >= 'a') && (ptr[index] <= 'f')) ||
+                ((ptr[index] >= 'A') && (ptr[index] <= 'F'))) {
+                parse_state = ps_digits;
+                digits++;
+
+            } else {
+                parse_state = ps_error;
+            }
+        }
+
+        case ps_digits: {
+
+            if (((ptr[index] >= '0') && (ptr[index] <= '9')) ||
+                ((ptr[index] >= 'a') && (ptr[index] <= 'f')) ||
+                ((ptr[index] >= 'A') && (ptr[index] <= 'F'))) {
+                parse_state = ps_digits;
+                digits++;
+
+                value <<= 4;
+                if ((ptr[index] >= '0') && (ptr[index] <= '9')) value |= (ptr[index] - '0');
+                if ((ptr[index] >= 'a') && (ptr[index] <= 'f')) value |= ((ptr[index] - 'a') + 0xA);
+                if ((ptr[index] >= 'A') && (ptr[index] <= 'F')) value |= ((ptr[index] - 'A') + 0xA);
+
+                index++;
+
+            } else {
+                parse_state = ps_done;
+            }
+
+        } break;
+
+        default: break;
+        }
+    }
+
+    if (pos) {
+        *pos = ptr + index;
+    }
+
+    if (result) {
+        *result = (parse_state != ps_error);
+    }
+
+    return value;
 }
 
-static size_t enxtxt_conv_u16_to_hex_in_place(uint16_t value, char *result)
+uint32_t enxtxt_hex_to_u32_pl_ex(const char *ptr, size_t length, const char **pos, bool *result)
 {
-    *result++ = enxtxt_hex_digits[(value & 0xF000) >> 12];
-    *result++ = enxtxt_hex_digits[(value & 0x0F00) >> 8];
-    *result++ = enxtxt_hex_digits[(value & 0x00F0) >> 4];
-    *result++ = enxtxt_hex_digits[(value & 0x000F) >> 0];
-    *result++ = 0;
-
-    return 4;
+    return enxtxt_hex_to_unsigned_pl_ex(ptr, length, pos, result, 8);
 }
 
-static size_t enxtxt_conv_u8_to_hex_in_place(uint8_t value, char *result)
+uint16_t enxtxt_hex_to_u16_pl_ex(const char *ptr, size_t length, const char **pos, bool *result)
 {
-    *result++ = enxtxt_hex_digits[(value & 0x00F0) >> 4];
-    *result++ = enxtxt_hex_digits[(value & 0x000F) >> 0];
-    *result++ = 0;
-
-    return 2;
+    return (uint16_t)enxtxt_hex_to_unsigned_pl_ex(ptr, length, pos, result, 4);
 }
 
-struct enxtxt_conv_result enxtxt_conv_u32_to_dec(uint32_t value)
+uint8_t enxtxt_hex_to_u8_pl_ex(const char *ptr, size_t length, const char **pos, bool *result)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_u32_to_dec_in_place(value, result.str);
-
-    return result;
+    return (uint8_t)enxtxt_hex_to_unsigned_pl_ex(ptr, length, pos, result, 2);
 }
 
-struct enxtxt_conv_result enxtxt_conv_s32_to_dec(int32_t value)
+int32_t enxtxt_dec_to_s32_nt_ex(const char *str, const char **pos, bool *result)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_s32_to_dec_in_place(value, result.str);
-    
-    return result;
+    return enxtxt_dec_to_s32_pl_ex(str, strlen(str), pos, result);
 }
 
-struct enxtxt_conv_result enxtxt_conv_u16_to_dec(uint16_t value)
+uint32_t enxtxt_dec_to_u32_nt_ex(const char *str, const char **pos, bool *result)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_u16_to_dec_in_place(value, result.str);
-
-    return result;
+    return enxtxt_dec_to_u32_pl_ex(str, strlen(str), pos, result);
 }
 
-struct enxtxt_conv_result enxtxt_conv_s16_to_dec(int16_t value)
+uint32_t enxtxt_hex_to_u32_nt_ex(const char *str, const char **pos, bool *result)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_s16_to_dec_in_place(value, result.str);
-    
-    return result;
+    return enxtxt_hex_to_u32_pl_ex(str, strlen(str), pos, result);
 }
 
-struct enxtxt_conv_result enxtxt_conv_u8_to_dec(uint8_t value)
+int32_t  enxtxt_dec_to_s32_pl(const char *ptr, size_t length)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_u16_to_dec_in_place(value, result.str);
-
-    return result;
+    return enxtxt_dec_to_s32_pl_ex(ptr, length, NULL, NULL);
 }
 
-struct enxtxt_conv_result enxtxt_conv_s8_to_dec(int8_t value)
+uint32_t enxtxt_dec_to_u32_pl(const char *ptr, size_t length)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_s8_to_dec_in_place(value, result.str);
-    
-    return result;
+    return enxtxt_dec_to_u32_pl_ex(ptr, length, NULL, NULL);
 }
 
-struct enxtxt_conv_result enxtxt_conv_u32_to_hex(uint32_t value)
+uint32_t enxtxt_hex_to_u32_pl(const char *ptr, size_t length)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_u32_to_hex_in_place(value, result.str);
-    
-    return result;
+    return enxtxt_hex_to_u32_pl_ex(ptr, length, NULL, NULL);
 }
 
-struct enxtxt_conv_result enxtxt_conv_u16_to_hex(uint16_t value)
+int32_t  enxtxt_dec_to_s32_nt(const char *str)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_u16_to_hex_in_place(value, result.str);
-    
-    return result;
+    return enxtxt_dec_to_s32_nt_ex(str, NULL, NULL);
 }
 
-struct enxtxt_conv_result enxtxt_conv_u8_to_hex(uint8_t value)
+uint32_t enxtxt_dec_to_u32_nt(const char *str)
 {
-    struct enxtxt_conv_result result;
-    result.length = enxtxt_conv_u8_to_hex_in_place(value, result.str);
-    
-    return result;
+    return enxtxt_dec_to_u32_nt_ex(str, NULL, NULL);
 }
+
+uint32_t enxtxt_hex_to_u32_nt(const char *str)
+{
+    return enxtxt_hex_to_u32_nt_ex(str, NULL, NULL);
+}
+
+size_t enxtxt_hex_to_u8_array_pl(
+    const char *ptr,
+    size_t length,
+    uint8_t *result,
+    size_t result_length)
+{
+    const char *pos;
+    bool success = false;
+    unsigned int index = 0;
+
+    do {
+        uint8_t value = enxtxt_hex_to_u8_pl_ex(ptr, length, &pos, &success);
+        if (success) {
+            result[index++] = value;
+            length -= (pos - ptr);
+            ptr = pos;
+        }
+
+    } while (success && (index < result_length));
+
+    return index;
+}
+

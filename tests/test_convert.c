@@ -32,173 +32,72 @@
 #include <string.h>
 
 
-static void test_conv_u32_to_dec(void **state)
+static void test_dec_str_to_s32(void **state)
 {
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
-
-    uint32_t value = 0;
-    do {
-        result = enxtxt_conv_u32_to_dec(value);
-        sprintf(verification_result, "%u", (unsigned int)value);
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
-
-        value += 256;
-
-    } while (value);
+    assert_true(enxtxt_dec_to_s32_nt("0") == 0);
+    assert_true(enxtxt_dec_to_s32_nt("-1") == -1);
+    assert_true(enxtxt_dec_to_s32_nt("2147483647") == 2147483647);
+    assert_true(enxtxt_dec_to_s32_nt("-2147483648") == -2147483648);
 }
 
-static void test_conv_s32_to_dec(void **state)
+static void test_dec_str_to_u32(void **state)
 {
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
-
-    uint32_t value = 0;
-    do {
-        result = enxtxt_conv_s32_to_dec(value);
-        sprintf(verification_result, "%d", (int)((int32_t)value));
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
-
-        value += 256;
-
-    } while (value);
+    assert_true(enxtxt_dec_to_u32_nt("0") == 0);
+    assert_true(enxtxt_dec_to_u32_nt("16384") == 16384);
+    assert_true(enxtxt_dec_to_u32_nt("4294967295") == 4294967295);
 }
 
-static void test_conv_u16_to_dec(void **state)
+static void test_hex_str_to_u32(void **state)
 {
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
+    assert_true(enxtxt_hex_to_u32_nt("0x00000000") == 0x00000000);
+    assert_true(enxtxt_hex_to_u32_nt("0xFFFFFFFF") == 0xFFFFFFFF);
+    assert_true(enxtxt_hex_to_u32_nt("0xABCDEF12") == 0xABCDEF12);
+    assert_true(enxtxt_hex_to_u32_nt("0xabcdef12") == 0xABCDEF12);
 
-    uint16_t value = 0;
-    do {
-        value--;
-        result = enxtxt_conv_u16_to_dec(value);
-        sprintf(verification_result, "%u", (unsigned int)value);
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
+    assert_true(enxtxt_hex_to_u32_nt("00000000") == 0x00000000);
+    assert_true(enxtxt_hex_to_u32_nt("FFFFFFFF") == 0xFFFFFFFF);
+    assert_true(enxtxt_hex_to_u32_nt("ABCDEF12") == 0xABCDEF12);
+    assert_true(enxtxt_hex_to_u32_nt("abcdef12") == 0xABCDEF12);
 
-    } while (value);
+    assert_true(enxtxt_hex_to_u32_nt("00000001") == 0x00000001);
+    assert_true(enxtxt_hex_to_u32_nt("0000000A") == 0x0000000A);
+    assert_true(enxtxt_hex_to_u32_nt("0000000a") == 0x0000000a);
+    assert_true(enxtxt_hex_to_u32_nt("0000000F") == 0x0000000F);
+    assert_true(enxtxt_hex_to_u32_nt("0000000f") == 0x0000000F);
 }
 
-static void test_conv_s16_to_dec(void **state)
+static void test_hex_to_u8_array(void **state)
 {
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
+    {
+        const char *input = "00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f";
+        uint8_t result[16];
+        uint8_t expected[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-    uint16_t value = 0;
-    do {
-        value--;
-        result = enxtxt_conv_s16_to_dec(value);
-        sprintf(verification_result, "%d", (int)((int16_t)value));
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
+        size_t length = enxtxt_hex_to_u8_array_pl(input, strlen(input), result, sizeof(result));
 
-    } while (value);
-}
+        assert_true(length == 16);
+        assert_true(memcmp(result, expected, sizeof(result)) == 0);
+    }
 
-static void test_conv_u8_to_dec(void **state)
-{
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
+    {
+        const char *input = "000102030405060708090a0b0c0d0e0f";
+        uint8_t result[16];
+        uint8_t expected[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-    uint8_t value = 0;
-    do {
-        value--;
-        result = enxtxt_conv_u8_to_dec(value);
-        sprintf(verification_result, "%u", (unsigned int)value);
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
+        size_t length = enxtxt_hex_to_u8_array_pl(input, strlen(input), result, sizeof(result));
 
-    } while (value);
-}
-
-static void test_conv_s8_to_dec(void **state)
-{
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
-
-    uint8_t value = 0;
-    do {
-        value--;
-        result = enxtxt_conv_s8_to_dec(value);
-        sprintf(verification_result, "%d", (int)((int8_t)value));
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
-
-    } while (value);
-}
-
-static void test_conv_u32_to_hex(void **state)
-{
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
-
-    uint32_t value = 0;
-    do {
-        result = enxtxt_conv_u32_to_hex(value);
-        sprintf(verification_result, "%08X", (unsigned int)value);
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
-        value += 256;
-
-    } while (value);
-}
-
-static void test_conv_u16_to_hex(void **state)
-{
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
-
-    uint16_t value = 0;
-    do {
-        value--;
-        result = enxtxt_conv_u16_to_hex(value);
-        sprintf(verification_result, "%04X", (unsigned int)value);
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
-
-    } while (value);
-}
-
-static void test_conv_u8_to_hex(void **state)
-{
-    (void)state;
-    struct enxtxt_conv_result result;
-    char verification_result[24];
-
-    uint8_t value = 0;
-    do {
-        value--;
-        result = enxtxt_conv_u8_to_hex(value);
-        sprintf(verification_result, "%02X", (unsigned int)value);
-        assert_true(strcmp(result.str, verification_result) == 0);
-        assert_true(strlen(result.str) == result.length);
-
-    } while (value);
+        assert_true(length == 16);
+        assert_true(memcmp(result, expected, sizeof(result)) == 0);
+    }
 }
 
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_conv_u32_to_dec),
-        cmocka_unit_test(test_conv_s32_to_dec),
-        cmocka_unit_test(test_conv_u16_to_dec),
-        cmocka_unit_test(test_conv_s16_to_dec),
-        cmocka_unit_test(test_conv_u8_to_dec),
-        cmocka_unit_test(test_conv_s8_to_dec),
-        cmocka_unit_test(test_conv_u32_to_hex),
-        cmocka_unit_test(test_conv_u16_to_hex),
-        cmocka_unit_test(test_conv_u8_to_hex)
+        cmocka_unit_test(test_dec_str_to_s32),
+        cmocka_unit_test(test_dec_str_to_u32),
+        cmocka_unit_test(test_hex_str_to_u32),
+        cmocka_unit_test(test_hex_to_u8_array)
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

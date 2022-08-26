@@ -30,64 +30,121 @@
 
 __BEGIN_DECLS
 
-/**
- * @brief Conversion result
- * 
- * The buffer has enough space to hold up to a 64 bit
- * unsigned integer conversion.
- * 
+/** @defgroup pl_ex Pointer and length extended functions
+ *  @{
  */
-struct enxtxt_conv_result 
-{
-    char str[24];
-    size_t length;
-};
 
 /**
- * @brief Converts a 32 bit unsigned integer to a decimal string
+ * @brief Decimal to signed 32 bit
  */
-struct enxtxt_conv_result enxtxt_conv_u32_to_dec(uint32_t value);
+int32_t  enxtxt_dec_to_s32_pl_ex(const char *ptr, size_t length, const char **pos, bool *result);
 
 /**
- * @brief Converts a 32 bit signed integer to a decimal string
+ * @brief Decimal to unsigned 32 bit
  */
-struct enxtxt_conv_result enxtxt_conv_s32_to_dec(int32_t value);
+uint32_t enxtxt_dec_to_u32_pl_ex(const char *ptr, size_t length, const char **pos, bool *result);
 
 /**
- * @brief Converts a 16 bit unsigned integer to a decimal string
+ * @brief Hexadecimal to unsigned 32 bit
+ * @note This function will stop to consume digits after 8 digits have been processed, even
+ *       if there is more digits available
  */
-struct enxtxt_conv_result enxtxt_conv_u16_to_dec(uint16_t value);
+uint32_t enxtxt_hex_to_u32_pl_ex(const char *ptr, size_t length, const char **pos, bool *result);
 
 /**
- * @brief Converts a 16 bit signed integer to a decimal string
+ * @brief Hexadecimal to unsigned 16 bit
+ * @note This function will stop to consume digits after 4 digits have been processed, even
+ *       if there is more digits available
  */
-struct enxtxt_conv_result enxtxt_conv_s16_to_dec(int16_t value);
+uint16_t enxtxt_hex_to_u16_pl_ex(const char *ptr, size_t length, const char **pos, bool *result);
 
 /**
- * @brief Converts an 8 bit unsigned integer to a decimal string
+ * @brief Hexadecimal to unsigned 8 bit
+ * @note This function will stop to consume digits after 2 digits have been processed, even
+ *       if there is more digits available
  */
-struct enxtxt_conv_result enxtxt_conv_u8_to_dec(uint8_t value);
+uint8_t enxtxt_hex_to_u8_pl_ex(const char *ptr, size_t length, const char **pos, bool *result);
+
+/** @} */
+
+
+/** @defgroup nt_ex Null terminated string extended functions
+ *  @{
+ */
 
 /**
- * @brief Converts an 8 bit signed integer to a decimal string
+ * @brief Decimal to signed 32 bit
  */
-struct enxtxt_conv_result enxtxt_conv_s8_to_dec(int8_t value);
+int32_t  enxtxt_dec_to_s32_nt_ex(const char *str, const char **pos, bool *result);
 
 /**
- * @brief Converts a 32 bit unsigned integer to a hexadecimal string
+ * @brief Decimal to unsigned 32 bit
  */
-struct enxtxt_conv_result enxtxt_conv_u32_to_hex(uint32_t value);
+uint32_t enxtxt_dec_to_u32_nt_ex(const char *str, const char **pos, bool *result);
 
 /**
- * @brief Converts a 16 bit unsigned integer to a hexadecimal string
+ * @brief Hexadecimal to unsigned 32 bit
  */
-struct enxtxt_conv_result enxtxt_conv_u16_to_hex(uint16_t value);
+uint32_t enxtxt_hex_to_u32_nt_ex(const char *str, const char **pos, bool *result);
+
+/** @} */
+
+
+/** @defgroup pl Pointer and length functions
+ *  @{
+ */
 
 /**
- * @brief Converts an 8 bit unsigned integer to a hexadecimal string
+ * @brief Decimal to signed 32 bit
  */
-struct enxtxt_conv_result enxtxt_conv_u8_to_hex(uint8_t value);
+int32_t  enxtxt_dec_to_s32_pl(const char *ptr, size_t length);
 
+/**
+ * @brief Decimal to unsigned 32 bit
+ */
+uint32_t enxtxt_dec_to_u32_pl(const char *ptr, size_t length);
+
+/**
+ * @brief Hexadecimal to unsigned 32 bit
+ */
+uint32_t enxtxt_hex_to_u32_pl(const char *ptr, size_t length);
+
+/** @} */
+
+
+/** @defgroup nt Null terminated string functions
+ *  @{
+ */
+
+/**
+ * @brief Decimal to signed 32 bit
+ */
+int32_t  enxtxt_dec_to_s32_nt(const char *str);
+
+/**
+ * @brief Decimal to unsigned 32 bit
+ */
+uint32_t enxtxt_dec_to_u32_nt(const char *str);
+
+/**
+ * @brief Hexadecimal to unsigned 32 bit
+ */
+uint32_t enxtxt_hex_to_u32_nt(const char *str);
+
+/** @} */
+
+
+/** @defgroup array_pl Pointer and length array functions
+ *  @{
+ */
+
+size_t enxtxt_hex_to_u8_array_pl(
+    const char *ptr,
+    size_t length,
+    uint8_t *result,
+    size_t result_length);
+
+/** @} */
 
 __END_DECLS
 
