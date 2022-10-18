@@ -7,6 +7,8 @@ add_library(
     include/enx/txt/convert.h
     src/format.c
     include/enx/txt/format.h
+    src/tokenizer.c
+    include/enx/txt/tokenizer.h
     )
 
 target_include_directories(enxtxt PUBLIC include)
