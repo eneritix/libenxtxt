@@ -30,13 +30,14 @@ void enxtxt_tokenizer_init(
     const char *ptr,
     size_t length) {
 
-    obj->head = ptr;
+    obj->ptr = ptr;
+    obj->index = -1;
 
     if (length) {
-        obj->tail = (obj->head + length);
+        obj->length = length;;
 
     } else {
-        obj->tail = (obj->head + strlen(ptr));
+        obj->length = strlen(ptr);
     }
 }
 
@@ -45,24 +46,22 @@ bool enxtxt_tokenizer_get_next(
     char delimiter,
     struct enxtxt_token *token) {
 
-    if (obj->head == obj->tail) {
+    if (obj->index == obj->length) {
         return false;
     }
 
-    const char *ptr = obj->head;
-    while ((ptr != obj->tail) && (*ptr != delimiter)) {
-        ptr++;
+    // Advance
+    obj->index++;
+
+    // Find the next delimiter
+    token->ptr = (obj->ptr + obj->index);
+    token->length = obj->index;
+    while ((obj->index != obj->length) && (obj->ptr[obj->index] != delimiter)) {
+        obj->index++;
     }
 
-    token->ptr = obj->head;
-    token->length = (ptr - obj->head);
-
-    obj->head = ptr;
-    if (obj->head != obj->tail) {
-        obj->head++;
-    }
-
-    token->final = (obj->head == obj->tail);
+    token->length = (obj->index - token->length);
+    token->final = (obj->index == obj->length);
 
     return true;
 }

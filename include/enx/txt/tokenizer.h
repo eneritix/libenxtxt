@@ -27,15 +27,23 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <sys/cdefs.h>
+#include <sys/types.h>
 
 __BEGIN_DECLS
 
+/**
+ * @brief Tokenizer
+ */
 struct enxtxt_tokenizer
 {
-    const char *head;
-    const char *tail;
+    const char *ptr;
+    ssize_t length;
+    ssize_t index;
 };
 
+/**
+ * @brief Token
+ */
 struct enxtxt_token
 {
     const char *ptr;
@@ -43,11 +51,18 @@ struct enxtxt_token
     bool final;
 };
 
+/**
+ * @brief Initializes a tokenizer
+ */
 void enxtxt_tokenizer_init(
     struct enxtxt_tokenizer *obj,
     const char *ptr,
     size_t length);
 
+/**
+ * @brief Retrieves the next token
+ * @returns true if a token was available
+ */
 bool enxtxt_tokenizer_get_next(
     struct enxtxt_tokenizer *obj,
     char delimiter,

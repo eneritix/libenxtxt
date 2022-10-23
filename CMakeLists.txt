@@ -19,3 +19,6 @@ target_link_libraries(enxtxt_test_convert enxtxt cmocka)
 
 add_executable(enxtxt_test_format tests/test_format.c)
 target_link_libraries(enxtxt_test_format enxtxt cmocka)
+
+add_executable(enxtxt_test_tokenizer tests/test_tokenizer.c)
+target_link_libraries(enxtxt_test_tokenizer enxtxt cmocka)
