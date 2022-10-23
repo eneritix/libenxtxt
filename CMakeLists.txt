@@ -3,12 +3,9 @@ project(libenxtxt LANGUAGES C)
 
 add_library(
     enxtxt
-    src/convert.c
-    include/enx/txt/convert.h
-    src/format.c
-    include/enx/txt/format.h
-    src/tokenizer.c
-    include/enx/txt/tokenizer.h
+    source/convert.c
+    source/format.c
+    source/tokenizer.c
     )
 
 target_include_directories(enxtxt PUBLIC include)
