@@ -21,6 +21,7 @@
  */
 
 #include "format.h"
+#include <string.h>
 
 
 static size_t enxtxt_fmt_u32_dec_in_place(uint32_t value, char *result);
@@ -37,7 +38,7 @@ static size_t enxtxt_fmt_u16_hex_in_place(uint16_t value, char *result);
 static size_t enxtxt_fmt_u8_hex_in_place(uint8_t value, char *result);
 
 
-static const char enxtxt_hex_digits[] = 
+static const char enxtxt_hex_digits[] =
 {
     '0', '1', '2', '3',
     '4', '5', '6', '7',
@@ -207,7 +208,7 @@ static size_t enxtxt_fmt_u8_dec_in_place(uint8_t value, char *result)
     for (i=0; i < 8; ++i) {
 
         /* uint8_t max is 255 (3 digits). The first 8 bits of reg
-           is used for the value 
+           is used for the value
         */
         if ((reg & 0x000F0000) >= 0x00050000) reg += 0x00030000;
         if ((reg & 0x0000F000) >= 0x00005000) reg += 0x00003000;
@@ -289,7 +290,7 @@ struct enxtxt_fmt_result enxtxt_fmt_s32_dec(int32_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_s32_dec_in_place(value, result.str);
-    
+
     return result;
 }
 
@@ -305,7 +306,7 @@ struct enxtxt_fmt_result enxtxt_fmt_s16_dec(int16_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_s16_dec_in_place(value, result.str);
-    
+
     return result;
 }
 
@@ -321,7 +322,7 @@ struct enxtxt_fmt_result enxtxt_fmt_s8_dec(int8_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_s8_dec_in_place(value, result.str);
-    
+
     return result;
 }
 
@@ -329,7 +330,7 @@ struct enxtxt_fmt_result enxtxt_fmt_u32_hex(uint32_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_u32_hex_in_place(value, result.str);
-    
+
     return result;
 }
 
@@ -337,7 +338,7 @@ struct enxtxt_fmt_result enxtxt_fmt_u16_hex(uint16_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_u16_hex_in_place(value, result.str);
-    
+
     return result;
 }
 
@@ -345,6 +346,150 @@ struct enxtxt_fmt_result enxtxt_fmt_u8_hex(uint8_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_u8_hex_in_place(value, result.str);
-    
+
+    return result;
+}
+
+struct enxtxt_fmt_array_result enxtxt_fmt_u8_hex_array(
+    const uint8_t *source_ptr,
+    size_t source_length,
+    const char *separator,
+    char *dest_ptr,
+    size_t dest_length)
+{
+    struct enxtxt_fmt_array_result result;
+
+    result.entries_processed = 0;
+    result.bytes_written = 0;
+
+    if (source_length == 0) {
+        return result;
+    }
+
+    size_t entry_length = 2;
+
+    size_t separator_length = 0;
+    if (separator) {
+        separator_length = strlen(separator);
+    }
+
+    size_t total_length = separator_length + entry_length;
+
+    for (result.entries_processed = 0; result.entries_processed < (source_length - 1); result.entries_processed++) {
+        if (total_length > dest_length) {
+            return result;
+        }
+
+        dest_ptr += enxtxt_fmt_u8_hex_in_place(*source_ptr, dest_ptr);
+        memcpy(dest_ptr, separator, separator_length);
+        dest_ptr += separator_length;
+        dest_length -= total_length;
+        source_ptr += 1;
+        result.bytes_written += total_length;
+    }
+
+    if (dest_length >= entry_length) {
+        dest_ptr += enxtxt_fmt_u8_hex_in_place(*source_ptr, dest_ptr);
+
+        result.bytes_written += entry_length;
+        result.entries_processed++;
+    }
+
+    return result;
+}
+
+struct enxtxt_fmt_array_result enxtxt_fmt_u16_hex_array(
+    const uint16_t *source_ptr,
+    size_t source_length,
+    const char *separator,
+    char *dest_ptr,
+    size_t dest_length)
+{
+    struct enxtxt_fmt_array_result result;
+
+    result.entries_processed = 0;
+    result.bytes_written = 0;
+
+    if (source_length == 0) {
+        return result;
+    }
+
+    size_t entry_length = 4;
+
+    size_t separator_length = 0;
+    if (separator) {
+        separator_length = strlen(separator);
+    }
+
+    size_t total_length = separator_length + entry_length;
+
+    for (result.entries_processed = 0; result.entries_processed < (source_length - 1); result.entries_processed++) {
+        if (total_length > dest_length) {
+            return result;
+        }
+
+        dest_ptr += enxtxt_fmt_u16_hex_in_place(*source_ptr, dest_ptr);
+        memcpy(dest_ptr, separator, separator_length);
+        dest_ptr += separator_length;
+        dest_length -= total_length;
+        source_ptr += 1;
+        result.bytes_written += total_length;
+    }
+
+    if (dest_length >= entry_length) {
+        dest_ptr += enxtxt_fmt_u16_hex_in_place(*source_ptr, dest_ptr);
+
+        result.bytes_written += entry_length;
+        result.entries_processed++;
+    }
+
+    return result;
+}
+
+struct enxtxt_fmt_array_result enxtxt_fmt_u32_hex_array(
+    const uint32_t *source_ptr,
+    size_t source_length,
+    const char *separator,
+    char *dest_ptr,
+    size_t dest_length)
+{
+    struct enxtxt_fmt_array_result result;
+
+    result.entries_processed = 0;
+    result.bytes_written = 0;
+
+    if (source_length == 0) {
+        return result;
+    }
+
+    size_t entry_length = 8;
+
+    size_t separator_length = 0;
+    if (separator) {
+        separator_length = strlen(separator);
+    }
+
+    size_t total_length = separator_length + entry_length;
+
+    for (result.entries_processed = 0; result.entries_processed < (source_length - 1); result.entries_processed++) {
+        if (total_length > dest_length) {
+            return result;
+        }
+
+        dest_ptr += enxtxt_fmt_u32_hex_in_place(*source_ptr, dest_ptr);
+        memcpy(dest_ptr, separator, separator_length);
+        dest_ptr += separator_length;
+        dest_length -= total_length;
+        source_ptr += 1;
+        result.bytes_written += total_length;
+    }
+
+    if (dest_length >= entry_length) {
+        dest_ptr += enxtxt_fmt_u32_hex_in_place(*source_ptr, dest_ptr);
+
+        result.bytes_written += entry_length;
+        result.entries_processed++;
+    }
+
     return result;
 }

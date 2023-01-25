@@ -32,10 +32,10 @@ __BEGIN_DECLS
 
 /**
  * @brief Format result
- * 
- * The buffer has enough space as hold up as a 64 bit
- * unsigned integer fmtersion.
- * 
+ *
+ * The buffer has enough space to hold up to a 64 bit
+ * unsigned integer.
+ *
  */
 struct enxtxt_fmt_result
 {
@@ -87,6 +87,37 @@ struct enxtxt_fmt_result enxtxt_fmt_u16_hex(uint16_t value);
  * @brief Formats an 8 bit unsigned integer as a hexadecimal string
  */
 struct enxtxt_fmt_result enxtxt_fmt_u8_hex(uint8_t value);
+
+
+/**
+ * @brief Formats an 8 bit array as a hexadecimal string
+ */
+struct enxtxt_fmt_array_result
+{
+    size_t entries_processed;
+    size_t bytes_written;
+};
+
+struct enxtxt_fmt_array_result enxtxt_fmt_u8_hex_array(
+    const uint8_t *source_ptr,
+    size_t source_length,
+    const char *separator,
+    char *dest_ptr,
+    size_t dest_length);
+
+struct enxtxt_fmt_array_result enxtxt_fmt_u16_hex_array(
+    const uint16_t *source_ptr,
+    size_t source_length,
+    const char *separator,
+    char *dest_ptr,
+    size_t dest_length);
+
+struct enxtxt_fmt_array_result enxtxt_fmt_u32_hex_array(
+    const uint32_t *source_ptr,
+    size_t source_length,
+    const char *separator,
+    char *dest_ptr,
+    size_t dest_length);
 
 
 __END_DECLS
