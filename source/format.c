@@ -20,7 +20,7 @@
     SOFTWARE.
  */
 
-#include "format.h"
+#include <enx/txt/format.h>
 #include <string.h>
 
 

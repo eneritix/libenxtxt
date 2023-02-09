@@ -20,7 +20,7 @@
     SOFTWARE.
  */
 
-#include "tokenizer.h"
+#include <enx/txt/tokenizer.h>
 
 #include <string.h>
 

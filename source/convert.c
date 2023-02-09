@@ -20,7 +20,7 @@
     SOFTWARE.
  */
 
-#include "convert.h"
+#include <enx/txt/convert.h>
 #include <string.h>
 
 
