@@ -332,18 +332,17 @@ size_t enxtxt_hex_to_u8_array_pl(
     size_t result_length)
 {
     const char *pos;
-    bool success = false;
+    bool success = true;
     unsigned int index = 0;
 
-    do {
+    while (success && length && (index < result_length)) {
         uint8_t value = enxtxt_hex_to_u8_pl_ex(ptr, length, &pos, &success);
         if (success) {
             result[index++] = value;
             length -= (pos - ptr);
             ptr = pos;
         }
-
-    } while (success && (index < result_length));
+    }
 
     return index;
 }
