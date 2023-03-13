@@ -6,6 +6,7 @@ add_library(
     source/convert.c
     source/format.c
     source/tokenizer.c
+    source/fstr.c
     )
 
 target_include_directories(enxtxt PUBLIC include)
@@ -19,3 +20,6 @@ target_link_libraries(enxtxt_test_format enxtxt cmocka)
 
 add_executable(enxtxt_test_tokenizer tests/test_tokenizer.c)
 target_link_libraries(enxtxt_test_tokenizer enxtxt cmocka)
+
+add_executable(enxtxt_test_fstr tests/test_fstr.c)
+target_link_libraries(enxtxt_test_fstr enxtxt cmocka)
