@@ -118,7 +118,7 @@ void enxtxt_fstr_fmt_int(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_s32_dec(arg->value._int);
+    struct enxtxt_fmt_result result = enxtxt_fmt_s32_dec(arg->_int);
     output_fn(output_fn_context, result.str, result.length);
 }
 
@@ -127,7 +127,7 @@ void enxtxt_fstr_fmt_uint(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_u32_dec(arg->value._uint);
+    struct enxtxt_fmt_result result = enxtxt_fmt_u32_dec(arg->_uint);
     output_fn(output_fn_context, result.str, result.length);
 }
 
@@ -136,7 +136,7 @@ void enxtxt_fstr_fmt_h8(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_u8_hex(arg->value._uint);
+    struct enxtxt_fmt_result result = enxtxt_fmt_u8_hex(arg->_uint);
     output_fn(output_fn_context, result.str, result.length);
 }
 
@@ -145,7 +145,7 @@ void enxtxt_fstr_fmt_h16(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_u16_hex(arg->value._uint);
+    struct enxtxt_fmt_result result = enxtxt_fmt_u16_hex(arg->_uint);
     output_fn(output_fn_context, result.str, result.length);
 }
 
@@ -154,7 +154,7 @@ void enxtxt_fstr_fmt_h32(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_u32_hex(arg->value._uint);
+    struct enxtxt_fmt_result result = enxtxt_fmt_u32_hex(arg->_uint);
     output_fn(output_fn_context, result.str, result.length);
 }
 
@@ -163,7 +163,7 @@ void enxtxt_fstr_fmt_str(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    output_fn(output_fn_context, arg->value._str, strlen(arg->value._str));
+    output_fn(output_fn_context, arg->_str, strlen(arg->_str));
 }
 
 void enxtxt_fstr_fmt_h8_array(
@@ -171,7 +171,7 @@ void enxtxt_fstr_fmt_h8_array(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    const struct enxtxt_fstr_h8_array_metadata *data = (const struct enxtxt_fstr_h8_array_metadata *)arg->value._user;
+    const struct enxtxt_fstr_h8_array_metadata *data = (const struct enxtxt_fstr_h8_array_metadata *)arg->_user;
     char format_buffer[32];
 
     const unsigned char *ptr = data->ptr;

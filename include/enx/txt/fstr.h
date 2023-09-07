@@ -52,7 +52,7 @@ struct enxtxt_fstr_arg
         unsigned int _uint;
         const char *_str;
         void * _user;
-    } value;
+    };
 };
 
 struct enxtxt_fstr_h8_array_metadata
@@ -88,7 +88,7 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  * \param _val The value to format
  */
 #define f_str(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_str, .value._str  = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_str, ._str  = _val }
 
 /**
  * Formats a signed integer as decimal
@@ -96,7 +96,7 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  * \param _val The value to format
  */
 #define f_int(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_int, .value._int  = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_int, ._int  = _val }
 
 /**
  * Formats an unsigned integer as decimal
@@ -104,7 +104,7 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  * \param _val The value to format
  */
 #define f_uint(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_uint, .value._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_uint, ._uint = _val }
 
 /**
  * Formats an 8 bit unsigned integer as hex
@@ -112,7 +112,7 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  * \param _val The value to format
  */
 #define f_h8(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_h8, .value._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_h8, ._uint = _val }
 
 /**
  * Formats a 16 bit unsigned integer as hex
@@ -120,7 +120,7 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  * \param _val The value to format
  */
 #define f_h16(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_h16, .value._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_h16, ._uint = _val }
 
 /**
  * Formats a 32 bit unsigned integer as hex
@@ -128,7 +128,7 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  * \param _val The value to format
  */
 #define f_h32(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_h32, .value._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_h32, ._uint = _val }
 
 /**
  * Formats an 8 bit integer array as hex
