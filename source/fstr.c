@@ -23,6 +23,7 @@
 #include "fstr.h"
 #include <enx/txt/format.h>
 #include <string.h>
+#include <stdio.h>
 
 
 struct enxtxt_str_format_context
@@ -129,6 +130,26 @@ void enxtxt_fstr_fmt_uint(
 {
     struct enxtxt_fmt_result result = enxtxt_fmt_u32_dec(arg->_uint);
     output_fn(output_fn_context, result.str, result.length);
+}
+
+void enxtxt_fstr_fmt_flt(
+    const struct enxtxt_fstr_arg * arg,
+    enxtxt_fstr_output_function_t output_fn,
+    void *output_fn_context)
+{
+    char result[32];
+    size_t length = snprintf(result, sizeof(result), "%f", arg->_flt);
+    output_fn(output_fn_context, result, length);
+}
+
+void enxtxt_fstr_fmt_dbl(
+    const struct enxtxt_fstr_arg * arg,
+    enxtxt_fstr_output_function_t output_fn,
+    void *output_fn_context)
+{
+    char result[32];
+    size_t length = snprintf(result, sizeof(result), "%f", arg->_dbl);
+    output_fn(output_fn_context, result, length);
 }
 
 void enxtxt_fstr_fmt_h8(

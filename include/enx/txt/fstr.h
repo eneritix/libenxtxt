@@ -81,6 +81,8 @@ void enxtxt_fstr_fmt_h16(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_func
 void enxtxt_fstr_fmt_h32(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_str(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
+void enxtxt_fstr_fmt_flt(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
+void enxtxt_fstr_fmt_dbl(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 
 /**
  * Formats a character array
@@ -129,6 +131,22 @@ void enxtxt_fstr_fmt_h8_array(const struct enxtxt_fstr_arg *, enxtxt_fstr_output
  */
 #define f_h32(_val) \
     { .fn_fmt = enxtxt_fstr_fmt_h32, ._uint = _val }
+
+/**
+ * Formats a floating point value
+ *
+ * \param _val The value to format
+ */
+#define f_flt(_val) \
+    { .fn_fmt = enxtxt_fstr_fmt_flt, ._flt = _val }
+
+/**
+ * Formats a floating point value
+ *
+ * \param _val The value to format
+ */
+#define f_dbl(_val) \
+    { .fn_fmt = enxtxt_fstr_fmt_dbl, ._dbl = _val }
 
 /**
  * Formats an 8 bit integer array as hex
