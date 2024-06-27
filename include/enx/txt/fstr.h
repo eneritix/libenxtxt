@@ -51,7 +51,7 @@ struct enxtxt_fstr_arg
         int _int;
         unsigned int _uint;
         const char *_str;
-        void * _user;
+        const void * _user;
     };
 };
 
@@ -154,15 +154,8 @@ void enxtxt_fstr_fmt_dbl(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_func
  * \param _ptr A pointer to the array
  * \param _length The length of the array
  */
-#ifdef __cplusplus
-#define f_h8_array(_ptr, _length) \
-    { .fn_fmt = enxtxt_fstr_fmt_h8_array, ._user = new enxtxt_fstr_h8_array_metadata{ .ptr = _ptr, .length = _length} }
-
-#else
     #define f_h8_array(_ptr, _length) \
     { .fn_fmt = enxtxt_fstr_fmt_h8_array, ._user = (struct enxtxt_fstr_h8_array_metadata []) {{ .ptr = _ptr, .length = _length}} }
-#endif
-
 
 
 

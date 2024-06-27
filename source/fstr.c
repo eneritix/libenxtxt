@@ -204,8 +204,4 @@ void enxtxt_fstr_fmt_h8_array(
         ptr += result.entries_processed;
         length -= result.entries_processed;
     }
-
-#ifdef __cplusplus
-    delete data;
-#endif
 }
