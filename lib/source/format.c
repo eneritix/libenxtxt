@@ -21,6 +21,7 @@
  */
 
 #include <enx/txt/format.h>
+#include <stdio.h>
 #include <string.h>
 
 
@@ -322,6 +323,32 @@ struct enxtxt_fmt_result enxtxt_fmt_s8_dec(int8_t value)
 {
     struct enxtxt_fmt_result result;
     result.length = enxtxt_fmt_s8_dec_in_place(value, result.str);
+
+    return result;
+}
+
+struct enxtxt_fmt_result enxtxt_fmt_flt(float value, int precision)
+{
+    struct enxtxt_fmt_result result;
+
+    result.length = snprintf(result.str, sizeof(result.str), "%.*f", precision, value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
+    return result;
+}
+
+struct enxtxt_fmt_result enxtxt_fmt_dbl(double value, int precision)
+{
+    struct enxtxt_fmt_result result;
+
+    result.length = snprintf(result.str, sizeof(result.str), "%.*lf", precision, value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
 
     return result;
 }

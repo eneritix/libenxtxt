@@ -67,6 +67,8 @@ bool _enxtxt_fstr_cb(
         format = ptr;
 
     } while (*format != 0);
+
+    return true;
 }
 
 
@@ -137,9 +139,8 @@ void enxtxt_fstr_fmt_flt(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    char result[32];
-    size_t length = snprintf(result, sizeof(result), "%f", arg->_flt);
-    output_fn(output_fn_context, result, length);
+    struct enxtxt_fmt_result result = enxtxt_fmt_flt(arg->_flt, arg->_param);
+    output_fn(output_fn_context, result.str, result.length);
 }
 
 void enxtxt_fstr_fmt_dbl(
@@ -147,9 +148,8 @@ void enxtxt_fstr_fmt_dbl(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    char result[32];
-    size_t length = snprintf(result, sizeof(result), "%f", arg->_dbl);
-    output_fn(output_fn_context, result, length);
+    struct enxtxt_fmt_result result = enxtxt_fmt_flt(arg->_dbl, arg->_param);
+    output_fn(output_fn_context, result.str, result.length);
 }
 
 void enxtxt_fstr_fmt_h8(

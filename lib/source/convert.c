@@ -227,7 +227,7 @@ static uint32_t enxtxt_hex_to_unsigned_pl_ex(const char *ptr, size_t length, con
             } else {
                 parse_state = ps_error;
             }
-        }
+        } break;
 
         case ps_digits: {
 

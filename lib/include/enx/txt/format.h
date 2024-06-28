@@ -74,6 +74,16 @@ struct enxtxt_fmt_result enxtxt_fmt_u8_dec(uint8_t value);
 struct enxtxt_fmt_result enxtxt_fmt_s8_dec(int8_t value);
 
 /**
+ * @brief Formats a single precision floating point value
+ */
+struct enxtxt_fmt_result enxtxt_fmt_flt(float value, int precision);
+
+/**
+ * @brief Formats a double precision floating point value
+ */
+struct enxtxt_fmt_result enxtxt_fmt_dbl(double value, int precision);
+
+/**
  * @brief Formats a 32 bit unsigned integer as a hexadecimal string
  */
 struct enxtxt_fmt_result enxtxt_fmt_u32_hex(uint32_t value);

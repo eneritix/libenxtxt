@@ -53,6 +53,7 @@ struct enxtxt_fstr_arg
         const char *_str;
         const void * _user;
     };
+    uint32_t _param;
 };
 
 struct enxtxt_fstr_h8_array_metadata
@@ -137,16 +138,16 @@ void enxtxt_fstr_fmt_dbl(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_func
  *
  * \param _val The value to format
  */
-#define f_flt(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_flt, ._flt = _val }
+#define f_flt(_val, _precision) \
+    { .fn_fmt = enxtxt_fstr_fmt_flt, ._flt = _val, ._param = _precision }
 
 /**
  * Formats a floating point value
  *
  * \param _val The value to format
  */
-#define f_dbl(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_dbl, ._dbl = _val }
+#define f_dbl(_val, _precision) \
+    { .fn_fmt = enxtxt_fstr_fmt_dbl, ._dbl = _val, ._param = _precision }
 
 /**
  * Formats an 8 bit integer array as hex

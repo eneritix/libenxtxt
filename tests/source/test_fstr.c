@@ -49,10 +49,27 @@ static void test_fstr_basic(void **state)
     puts(buffer);
 }
 
+static void test_fstr_floating_point(void **state)
+{
+    (void)state;
+
+    char buffer[1024];
+
+    enxtxt_fstr_sz(
+        buffer,
+        sizeof(buffer),
+        "one={}, two={}",
+        f_flt(0.53763f, 5),
+        f_dbl(12.835, 3));
+
+    puts(buffer);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
-        cmocka_unit_test(test_fstr_basic)
+        cmocka_unit_test(test_fstr_basic),
+        cmocka_unit_test(test_fstr_floating_point)
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
