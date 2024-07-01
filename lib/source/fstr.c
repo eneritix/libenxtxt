@@ -139,6 +139,22 @@ void enxtxt_fstr_fmt_uint(
     output_fn(output_fn_context, result.str, result.length);
 }
 
+void enxtxt_fstr_fmt_size(
+    const struct enxtxt_fstr_arg *arg,
+    enxtxt_fstr_output_function_t output_fn,
+    void *output_fn_context) {
+
+#if (SIZE_MAX == 0xFFFF)
+    struct enxtxt_fmt_result result = enxtxt_fmt_u16_dec((uint16_t)arg->_size);
+#elif (SIZE_MAX == 0xFFFFFFFF)
+    struct enxtxt_fmt_result result = enxtxt_fmt_u32_dec((uint32_t)arg->_size);
+#else
+    struct enxtxt_fmt_result result = enxtxt_fmt_u64_dec((uint64_t)arg->_size);
+#endif
+
+    output_fn(output_fn_context, result.str, result.length);
+}
+
 void enxtxt_fstr_fmt_flt(
     const struct enxtxt_fstr_arg * arg,
     enxtxt_fstr_output_function_t output_fn,

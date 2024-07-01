@@ -25,6 +25,9 @@
 #include <string.h>
 
 
+static size_t enxtxt_fmt_u64_dec_in_place(uint64_t value, char *result);
+static size_t enxtxt_fmt_s64_dec_in_place(int64_t value, char *result);
+
 static size_t enxtxt_fmt_u32_dec_in_place(uint32_t value, char *result);
 static size_t enxtxt_fmt_s32_dec_in_place(int32_t value, char *result);
 
@@ -47,6 +50,116 @@ static const char enxtxt_hex_digits[] =
     'C', 'D', 'E', 'F'
 };
 
+static size_t enxtxt_fmt_u64_dec_in_place(uint64_t value, char *result)
+{
+    /* https://en.wikipedia.org/wiki/Double_dabble */
+
+    char *ptr = result;
+    uint32_t reg0, reg1, reg2;
+    uint32_t i = 0;
+    uint8_t digit;
+    bool output;
+
+    reg0 = 0;
+    reg1 = 0;
+    reg2 = 0;
+
+
+    for (i=0; i < 64; ++i) {
+
+        /* uint64_t max is 18446744073709551616 (20 digits). We need to process
+         * all the nibbles of reg0 and reg1,  and only the first four nibbles of reg2.
+         * The operations for the rest of the nibbles are kept for completeness
+         * but commented out for performance.
+         */
+        /* if ((reg2 & 0xF0000000) >= 0x50000000) reg2 += 0x30000000; */
+        /* if ((reg2 & 0x0F000000) >= 0x05000000) reg2 += 0x03000000; */
+        /* if ((reg2 & 0x00F00000) >= 0x00500000) reg2 += 0x00300000; */
+        /* if ((reg2 & 0x000F0000) >= 0x00050000) reg2 += 0x00030000; */
+        if ((reg2 & 0x0000F000) >= 0x00005000) reg2 += 0x00003000;
+        if ((reg2 & 0x00000F00) >= 0x00000500) reg2 += 0x00000300;
+        if ((reg2 & 0x000000F0) >= 0x00000050) reg2 += 0x00000030;
+        if ((reg2 & 0x0000000F) >= 0x00000005) reg2 += 0x00000003;
+
+        if ((reg1 & 0xF0000000) >= 0x50000000) reg1 += 0x30000000;
+        if ((reg1 & 0x0F000000) >= 0x05000000) reg1 += 0x03000000;
+        if ((reg1 & 0x00F00000) >= 0x00500000) reg1 += 0x00300000;
+        if ((reg1 & 0x000F0000) >= 0x00050000) reg1 += 0x00030000;
+        if ((reg1 & 0x0000F000) >= 0x00005000) reg1 += 0x00003000;
+        if ((reg1 & 0x00000F00) >= 0x00000500) reg1 += 0x00000300;
+        if ((reg1 & 0x000000F0) >= 0x00000050) reg1 += 0x00000030;
+        if ((reg1 & 0x0000000F) >= 0x00000005) reg1 += 0x00000003;
+
+        if ((reg0 & 0xF0000000) >= 0x50000000) reg0 += 0x30000000;
+        if ((reg0 & 0x0F000000) >= 0x05000000) reg0 += 0x03000000;
+        if ((reg0 & 0x00F00000) >= 0x00500000) reg0 += 0x00300000;
+        if ((reg0 & 0x000F0000) >= 0x00050000) reg0 += 0x00030000;
+        if ((reg0 & 0x0000F000) >= 0x00005000) reg0 += 0x00003000;
+        if ((reg0 & 0x00000F00) >= 0x00000500) reg0 += 0x00000300;
+        if ((reg0 & 0x000000F0) >= 0x00000050) reg0 += 0x00000030;
+        if ((reg0 & 0x0000000F) >= 0x00000005) reg0 += 0x00000003;
+
+        /* Shift */
+        reg2 <<= 1;
+        reg2 |= (reg1 >> 31);
+
+        reg1 <<= 1;
+        reg1 |= (reg0 >> 31);
+
+        reg0 <<= 1;
+        reg0 |= (uint32_t)(value >> 63);
+
+        value <<= 1;
+    }
+
+    // Collect
+    output = false;
+
+    /* digit = ((reg2 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg2 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg2 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg2 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    digit = ((reg2 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg2 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg2 & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg2 & 0x0000000F) >> 0 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+
+    digit = ((reg1 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg1 & 0x0000000F) >> 0 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+
+    digit = ((reg0 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
+    digit = ((reg0 & 0x0000000F) >> 0 );                                    *ptr++ = ('0' + digit);
+
+    *ptr++ = 0;
+
+    return (ptr - result - 1);
+
+}
+
+static size_t enxtxt_fmt_s64_dec_in_place(int64_t value, char *result)
+{
+    char *ptr = result;
+    const int64_t mask = (value >> 63);
+    const uint64_t absolute_value = ((value + mask) ^ mask);
+
+    if (mask) {
+        *ptr++ = '-';
+    }
+
+    return ((ptr - result) + enxtxt_fmt_u64_dec_in_place(absolute_value, ptr));
+}
 
 static size_t enxtxt_fmt_u32_dec_in_place(uint32_t value, char *result)
 {
@@ -100,12 +213,12 @@ static size_t enxtxt_fmt_u32_dec_in_place(uint32_t value, char *result)
     // Collect
     output = false;
 
-    /* digit = ((reg1 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
-    /* digit = ((reg1 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *result++ = ('0' + digit); */
+    /* digit = ((reg1 & 0xF0000000) >> 28); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg1 & 0x0F000000) >> 24); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg1 & 0x00F00000) >> 20); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg1 & 0x000F0000) >> 16); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg1 & 0x0000F000) >> 12); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
+    /* digit = ((reg1 & 0x00000F00) >> 8 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit); */
     digit = ((reg1 & 0x000000F0) >> 4 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
     digit = ((reg1 & 0x0000000F) >> 0 ); output |= (digit > 0); if (output) *ptr++ = ('0' + digit);
 
@@ -277,6 +390,22 @@ static size_t enxtxt_fmt_u8_hex_in_place(uint8_t value, char *result)
     *result++ = 0;
 
     return 2;
+}
+
+struct enxtxt_fmt_result enxtxt_fmt_u64_dec(uint64_t value)
+{
+    struct enxtxt_fmt_result result;
+    result.length = enxtxt_fmt_u64_dec_in_place(value, result.str);
+
+    return result;
+}
+
+struct enxtxt_fmt_result enxtxt_fmt_s64_dec(int64_t value)
+{
+    struct enxtxt_fmt_result result;
+    result.length = enxtxt_fmt_s64_dec_in_place(value, result.str);
+
+    return result;
 }
 
 struct enxtxt_fmt_result enxtxt_fmt_u32_dec(uint32_t value)

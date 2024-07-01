@@ -50,6 +50,7 @@ struct enxtxt_fstr_arg
         double _dbl;
         int _int;
         unsigned int _uint;
+        size_t _size;
         const char *_str;
         const void * _user;
     };
@@ -77,6 +78,7 @@ struct enxtxt_fstr_h32_array_metadata
 /* Internal format functions */
 void enxtxt_fstr_fmt_int(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_uint(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
+void enxtxt_fstr_fmt_size(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h8(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h16(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h32(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
@@ -108,6 +110,14 @@ void enxtxt_fstr_fmt_dbl(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_func
  */
 #define f_uint(_val) \
     { .fn_fmt = enxtxt_fstr_fmt_uint, ._uint = _val }
+
+/**
+ * Formats a size_t as decimal
+ *
+ * \param _val The value to format
+ */
+#define f_size(_val) \
+    { .fn_fmt = enxtxt_fstr_fmt_size, ._size = _val }
 
 /**
  * Formats an 8 bit unsigned integer as hex

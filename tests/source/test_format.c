@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #include <enx/txt/format.h>
 
@@ -30,6 +31,44 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <string.h>
+
+static void test_fmt_u64_dec(void **state)
+{
+    (void)state;
+    struct enxtxt_fmt_result result;
+    char verification_result[24];
+
+    uint64_t value = 0;
+    do {
+        result = enxtxt_fmt_u64_dec(value);
+        sprintf(verification_result, "%"PRIu64"", value);
+
+        assert_true(strcmp(result.str, verification_result) == 0);
+        assert_true(strlen(result.str) == result.length);
+
+
+        value += 1099511627776;
+
+    } while (value);
+}
+
+static void test_fmt_s64_dec(void **state)
+{
+    (void)state;
+    struct enxtxt_fmt_result result;
+    char verification_result[24];
+
+    uint64_t value = 0;
+    do {
+        result = enxtxt_fmt_s64_dec(value);
+        sprintf(verification_result, "%"PRIi64"", (int64_t)value);
+        assert_true(strcmp(result.str, verification_result) == 0);
+        assert_true(strlen(result.str) == result.length);
+
+        value += 1099511627776;
+
+    } while (value);
+}
 
 
 static void test_fmt_u32_dec(void **state)
@@ -190,6 +229,8 @@ static void test_fmt_u8_hex(void **state)
 int main(void)
 {
     const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_fmt_u64_dec),
+        cmocka_unit_test(test_fmt_s64_dec),
         cmocka_unit_test(test_fmt_u32_dec),
         cmocka_unit_test(test_fmt_s32_dec),
         cmocka_unit_test(test_fmt_u16_dec),

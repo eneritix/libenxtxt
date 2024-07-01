@@ -44,6 +44,16 @@ struct enxtxt_fmt_result
 };
 
 /**
+ * @brief Formats a 64 bit unsigned integer as a decimal string
+ */
+struct enxtxt_fmt_result enxtxt_fmt_u64_dec(uint64_t value);
+
+/**
+ * @brief Formats a 64 bit signed integer as a decimal string
+ */
+struct enxtxt_fmt_result enxtxt_fmt_s64_dec(int64_t value);
+
+/**
  * @brief Formats a 32 bit unsigned integer as a decimal string
  */
 struct enxtxt_fmt_result enxtxt_fmt_u32_dec(uint32_t value);
