@@ -44,7 +44,7 @@ bool _enxtxt_fstr_cb(
 {
     do {
         const char *ptr = format;
-        while ((*ptr != '{') && (*ptr != 0)) {
+        while ((*ptr != '{') && (*ptr != '\n') && (*ptr != 0)) {
             ptr++;
         }
 
@@ -62,6 +62,11 @@ bool _enxtxt_fstr_cb(
                 args++;
                 ptr++;
             }
+        }
+
+        if (*ptr == '\n') {
+            output_fn(output_fn_context, ptr, 1);
+            ptr++;
         }
 
         format = ptr;
