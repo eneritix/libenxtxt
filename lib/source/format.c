@@ -456,7 +456,33 @@ struct enxtxt_fmt_result enxtxt_fmt_s8_dec(int8_t value)
     return result;
 }
 
-struct enxtxt_fmt_result enxtxt_fmt_flt(float value, int precision)
+struct enxtxt_fmt_result enxtxt_fmt_flt(float value)
+{
+    struct enxtxt_fmt_result result;
+
+    result.length = snprintf(result.str, sizeof(result.str), "%f", value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
+    return result;
+}
+
+struct enxtxt_fmt_result enxtxt_fmt_dbl(double value)
+{
+    struct enxtxt_fmt_result result;
+
+    result.length = snprintf(result.str, sizeof(result.str), "%lf", value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
+    return result;
+}
+
+struct enxtxt_fmt_result enxtxt_fmt_flt_n(float value, int precision)
 {
     struct enxtxt_fmt_result result;
 
@@ -469,7 +495,7 @@ struct enxtxt_fmt_result enxtxt_fmt_flt(float value, int precision)
     return result;
 }
 
-struct enxtxt_fmt_result enxtxt_fmt_dbl(double value, int precision)
+struct enxtxt_fmt_result enxtxt_fmt_dbl_n(double value, int precision)
 {
     struct enxtxt_fmt_result result;
 

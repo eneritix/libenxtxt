@@ -160,7 +160,7 @@ void enxtxt_fstr_fmt_flt(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_flt(arg->_flt, arg->_param);
+    struct enxtxt_fmt_result result = enxtxt_fmt_flt(arg->_flt);
     output_fn(output_fn_context, result.str, result.length);
 }
 
@@ -169,7 +169,25 @@ void enxtxt_fstr_fmt_dbl(
     enxtxt_fstr_output_function_t output_fn,
     void *output_fn_context)
 {
-    struct enxtxt_fmt_result result = enxtxt_fmt_flt(arg->_dbl, arg->_param);
+    struct enxtxt_fmt_result result = enxtxt_fmt_dbl(arg->_dbl);
+    output_fn(output_fn_context, result.str, result.length);
+}
+
+void enxtxt_fstr_fmt_flt_n(
+    const struct enxtxt_fstr_arg * arg,
+    enxtxt_fstr_output_function_t output_fn,
+    void *output_fn_context)
+{
+    struct enxtxt_fmt_result result = enxtxt_fmt_flt_n(arg->_flt, arg->_param);
+    output_fn(output_fn_context, result.str, result.length);
+}
+
+void enxtxt_fstr_fmt_dbl_n(
+    const struct enxtxt_fstr_arg * arg,
+    enxtxt_fstr_output_function_t output_fn,
+    void *output_fn_context)
+{
+    struct enxtxt_fmt_result result = enxtxt_fmt_dbl_n(arg->_dbl, arg->_param);
     output_fn(output_fn_context, result.str, result.length);
 }
 
