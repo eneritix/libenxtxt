@@ -20,7 +20,7 @@
     SOFTWARE.
  */
 
-#include "fstr.h"
+#include <enx/txt/fstr.h>
 #include <enx/txt/format.h>
 #include <string.h>
 #include <stdio.h>
