@@ -460,7 +460,7 @@ struct enxtxt_fmt_result enxtxt_fmt_flt(float value)
 {
     struct enxtxt_fmt_result result;
 
-    result.length = snprintf(result.str, sizeof(result.str), "%f", value);
+    result.length = snprintf(result.str, sizeof(result.str), "%f", (double)value);
     if (result.length >= sizeof(result.str)) {
         result.str[0] = 0;
         result.length = 0;
@@ -486,7 +486,7 @@ struct enxtxt_fmt_result enxtxt_fmt_flt_n(float value, int precision)
 {
     struct enxtxt_fmt_result result;
 
-    result.length = snprintf(result.str, sizeof(result.str), "%.*f", precision, value);
+    result.length = snprintf(result.str, sizeof(result.str), "%.*f", precision, (double)value);
     if (result.length >= sizeof(result.str)) {
         result.str[0] = 0;
         result.length = 0;
