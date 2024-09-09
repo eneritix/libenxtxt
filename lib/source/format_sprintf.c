@@ -21,7 +21,6 @@
  */
 
 #include <enx/txt/format.h>
-#include <ryu/ryu.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -460,7 +459,15 @@ struct enxtxt_fmt_result enxtxt_fmt_s8_dec(int8_t value)
 struct enxtxt_fmt_result enxtxt_fmt_flt(float value)
 {
     struct enxtxt_fmt_result result;
-    result.length = d2s_buffered_n((double)value, result.str);
+
+    result.length = 0;
+    int r = snprintf(result.str, sizeof(result.str), "%.4f", (double)value);
+    result.length = r;
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
     return result;
 }
 
@@ -468,7 +475,12 @@ struct enxtxt_fmt_result enxtxt_fmt_dbl(double value)
 {
     struct enxtxt_fmt_result result;
 
-    result.length = d2s_buffered_n(value, result.str);
+    result.length = snprintf(result.str, sizeof(result.str), "%lf", value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
     return result;
 }
 
@@ -476,7 +488,12 @@ struct enxtxt_fmt_result enxtxt_fmt_flt_n(float value, int precision)
 {
     struct enxtxt_fmt_result result;
 
-    result.length = d2fixed_buffered_n((double)value, precision, result.str);
+    result.length = snprintf(result.str, sizeof(result.str), "%.*f", precision, (double)value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
     return result;
 }
 
@@ -484,7 +501,12 @@ struct enxtxt_fmt_result enxtxt_fmt_dbl_n(double value, int precision)
 {
     struct enxtxt_fmt_result result;
 
-    result.length = d2fixed_buffered_n((double)value, precision, result.str);
+    result.length = snprintf(result.str, sizeof(result.str), "%.*lf", precision, value);
+    if (result.length >= sizeof(result.str)) {
+        result.str[0] = 0;
+        result.length = 0;
+    }
+
     return result;
 }
 
