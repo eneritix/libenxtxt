@@ -7,7 +7,7 @@ set(enxtxt_SOURCES
     source/fstr.c
 )
 
-if (LIBENXTXT_USE_SPRINTF)
+if(LIBENXTXT_USE_SPRINTF)
     set(enxtxt_SOURCES
         ${enxtxt_SOURCES}
         source/format_sprintf.c
