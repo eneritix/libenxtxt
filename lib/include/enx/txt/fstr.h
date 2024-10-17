@@ -95,7 +95,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_str(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_str, ._str  = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_str, ._str  = _val, ._param = 0 }
 
 /**
  * Formats a signed integer as decimal
@@ -103,7 +103,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_int(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_int, ._int  = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_int, ._int  = _val, ._param = 0 }
 
 /**
  * Formats an unsigned integer as decimal
@@ -111,7 +111,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_uint(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_uint, ._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_uint, ._uint = _val, ._param = 0 }
 
 /**
  * Formats a size_t as decimal
@@ -119,7 +119,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_size(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_size, ._size = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_size, ._size = _val, ._param = 0 }
 
 /**
  * Formats an 8 bit unsigned integer as hex
@@ -127,7 +127,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_h8(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_h8, ._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_h8, ._uint = _val, ._param = 0 }
 
 /**
  * Formats a 16 bit unsigned integer as hex
@@ -135,7 +135,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_h16(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_h16, ._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_h16, ._uint = _val, ._param = 0 }
 
 /**
  * Formats a 32 bit unsigned integer as hex
@@ -143,7 +143,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _val The value to format
  */
 #define f_h32(_val) \
-    { .fn_fmt = enxtxt_fstr_fmt_h32, ._uint = _val }
+    { .fn_fmt = enxtxt_fstr_fmt_h32, ._uint = _val, ._param = 0 }
 
 /**
  * Formats a floating point value
@@ -184,7 +184,7 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _length The length of the array
  */
     #define f_h8_array(_ptr, _length) \
-    { .fn_fmt = enxtxt_fstr_fmt_h8_array, ._user = (struct enxtxt_fstr_h8_array_metadata []) {{ .ptr = _ptr, .length = _length}} }
+    { .fn_fmt = enxtxt_fstr_fmt_h8_array, ._user = (struct enxtxt_fstr_h8_array_metadata []) {{ .ptr = _ptr, .length = _length}}, ._param = 0 }
 
 
 
