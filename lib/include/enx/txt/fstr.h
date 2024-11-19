@@ -50,6 +50,8 @@ struct enxtxt_fstr_arg
         double _dbl;
         int _int;
         unsigned int _uint;
+        int64_t _s64;
+        uint64_t _u64;
         size_t _size;
         const char *_str;
         const void * _user;
@@ -79,6 +81,8 @@ struct enxtxt_fstr_h32_array_metadata
 void enxtxt_fstr_fmt_int(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_uint(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_size(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
+void enxtxt_fstr_fmt_s64(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
+void enxtxt_fstr_fmt_u64(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h8(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h16(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_h32(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
@@ -112,6 +116,22 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  */
 #define f_uint(_val) \
     { .fn_fmt = enxtxt_fstr_fmt_uint, ._uint = _val, ._param = 0 }
+
+/**
+ * Formats a signed 64 bit integer as decimal
+ *
+ * \param _val The value to format
+ */
+#define f_s64(_val) \
+    { .fn_fmt = enxtxt_fstr_fmt_s64, ._s64  = _val, ._param = 0 }
+
+/**
+ * Formats an unsigned 64 bit integer as decimal
+ *
+ * \param _val The value to format
+ */
+#define f_u64(_val) \
+    { .fn_fmt = enxtxt_fstr_fmt_u64, ._u64 = _val, ._param = 0 }
 
 /**
  * Formats a size_t as decimal

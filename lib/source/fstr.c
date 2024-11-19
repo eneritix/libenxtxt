@@ -155,6 +155,18 @@ void enxtxt_fstr_fmt_size(
     output_fn(output_fn_context, result.str, result.length);
 }
 
+void enxtxt_fstr_fmt_s64(const struct enxtxt_fstr_arg *arg, enxtxt_fstr_output_function_t output_fn, void *output_fn_context)
+{
+    struct enxtxt_fmt_result result = enxtxt_fmt_s64_dec(arg->_u64);
+    output_fn(output_fn_context, result.str, result.length);
+}
+
+void enxtxt_fstr_fmt_u64(const struct enxtxt_fstr_arg *arg, enxtxt_fstr_output_function_t output_fn, void *output_fn_context)
+{
+    struct enxtxt_fmt_result result = enxtxt_fmt_u64_dec(arg->_s64);
+    output_fn(output_fn_context, result.str, result.length);
+}
+
 void enxtxt_fstr_fmt_flt(
     const struct enxtxt_fstr_arg * arg,
     enxtxt_fstr_output_function_t output_fn,
