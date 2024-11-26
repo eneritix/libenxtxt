@@ -20,7 +20,7 @@ else()
 endif(LIBENXTXT_USE_SPRINTF)
 
 add_library(
-    enxtxt
+    enxtxt STATIC
     ${enxtxt_SOURCES}
     )
 
