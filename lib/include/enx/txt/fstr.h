@@ -92,6 +92,7 @@ void enxtxt_fstr_fmt_flt(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_func
 void enxtxt_fstr_fmt_dbl(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_flt_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
+void enxtxt_fstr_fmt_ipv4(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_function_t, void *);
 
 /**
  * Formats a character array
@@ -203,9 +204,16 @@ void enxtxt_fstr_fmt_dbl_n(const struct enxtxt_fstr_arg *, enxtxt_fstr_output_fu
  * \param _ptr A pointer to the array
  * \param _length The length of the array
  */
-    #define f_h8_array(_ptr, _length) \
+#define f_h8_array(_ptr, _length) \
     { .fn_fmt = enxtxt_fstr_fmt_h8_array, ._user = (struct enxtxt_fstr_h8_array_metadata []) {{ .ptr = _ptr, .length = _length}}, ._param = 0 }
 
+/**
+ * Formats a 32 bit integer as an IPv4 address
+ *
+ * \param _val The value to format
+ */
+#define f_ipv4(_val) \
+    { .fn_fmt = enxtxt_fstr_fmt_ipv4, ._uint = _val, ._param = 0 }
 
 
 bool _enxtxt_fstr_cb(

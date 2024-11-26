@@ -256,3 +256,30 @@ void enxtxt_fstr_fmt_h8_array(
         length -= result.entries_processed;
     }
 }
+
+void enxtxt_fstr_fmt_ipv4(
+    const struct enxtxt_fstr_arg *arg,
+    enxtxt_fstr_output_function_t output_fn,
+    void *output_fn_context)
+{
+    struct enxtxt_fmt_result result;
+
+    // A
+    result = enxtxt_fmt_u8_dec((arg->_uint >> 24) & 0xFF);
+    output_fn(output_fn_context, result.str, result.length);
+    output_fn(output_fn_context, ".", 1);
+
+    // B
+    result = enxtxt_fmt_u8_dec((arg->_uint >> 16) & 0xFF);
+    output_fn(output_fn_context, result.str, result.length);
+    output_fn(output_fn_context, ".", 1);
+
+    // C
+    result = enxtxt_fmt_u8_dec((arg->_uint >> 8) & 0xFF);
+    output_fn(output_fn_context, result.str, result.length);
+    output_fn(output_fn_context, ".", 1);
+
+    // D
+    result = enxtxt_fmt_u8_dec((arg->_uint >> 0) & 0xFF);
+    output_fn(output_fn_context, result.str, result.length);
+}
